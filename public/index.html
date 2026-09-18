@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>无线麦克风频率协调器</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>🎙️ 无线麦克风频率协调器</h1>
+      <p class="subtitle">互调冲突枚举 · 最小偏移自动协调 · 方案保存（最多 8 台设备）</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- 协调参数 -->
+    <section class="card">
+      <h2>协调参数</h2>
+      <div class="options-grid">
+        <label>
+          频段起点 (MHz)
+          <input type="number" id="bandStart" step="0.001" value="509.500" />
+        </label>
+        <label>
+          频段终点 (MHz)
+          <input type="number" id="bandEnd" step="0.001" value="511.500" />
+        </label>
+        <label>
+          步进 (kHz)
+          <input type="number" id="stepKhz" step="1" min="1" value="25" />
+        </label>
+        <label>
+          最大偏移 (kHz)
+          <input type="number" id="maxShiftKhz" step="1" min="0" value="750" />
+        </label>
+      </div>
+      <div class="actions">
+        <button id="btnAnalyze" class="btn">重新分析冲突</button>
+        <button id="btnCoordinate" class="btn btn-primary">自动协调</button>
+        <button id="btnSave" class="btn btn-success">保存方案</button>
+        <button id="btnAdd" class="btn btn-ghost">＋ 添加设备</button>
+      </div>
+      <div id="statusBar" class="status hidden"></div>
+    </section>
+
+    <!-- 设备表 -->
+    <section class="card">
+      <h2>设备清单 <span class="hint" id="deviceCount"></span></h2>
+      <div class="table-scroll">
+        <table id="deviceTable">
+          <thead>
+            <tr>
+              <th class="col-idx">#</th>
+              <th class="col-name">设备名称</th>
+              <th class="col-freq">工作频率 (MHz)</th>
+              <th class="col-guard">保护间隔 (kHz)</th>
+              <th class="col-lock">锁定</th>
+              <th class="col-shift">协调偏移</th>
+              <th class="col-del"></th>
+            </tr>
+          </thead>
+          <tbody id="deviceBody"></tbody>
+        </table>
+      </div>
+      <p class="hint">
+        保护区 = 载波 ±（保护间隔 / 2）。锁定的频道在自动协调时保持不动。
+        输入会实时重新分析互调冲突。
+      </p>
+    </section>
+
+    <!-- 频谱示意 -->
+    <section class="card">
+      <h2>频谱与保护区示意</h2>
+      <canvas id="spectrum" width="960" height="220"></canvas>
+      <div class="legend" id="spectrumLegend"></div>
+    </section>
+
+    <!-- 冲突列表 -->
+    <section class="card">
+      <h2>互调冲突分析 <span class="hint" id="conflictSummary"></span></h2>
+      <div id="conflictList" class="conflict-list"></div>
+    </section>
+
+    <!-- 已保存方案 -->
+    <section class="card">
+      <h2>已保存方案</h2>
+      <div id="planList" class="plan-list"></div>
+    </section>
+  </main>
+
+  <!-- 保存对话框 -->
+  <div id="saveModal" class="modal hidden">
+    <div class="modal-box">
+      <h3>保存协调方案</h3>
+      <label>方案名称
+        <input type="text" id="planName" maxlength="100" placeholder="例如：周六晚场 主扩" />
+      </label>
+      <label>备注（可选）
+        <textarea id="planNote" rows="3" maxlength="1000"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button id="btnCancelSave" class="btn btn-ghost">取消</button>
+        <button id="btnConfirmSave" class="btn btn-success">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="wrap">
+      Node.js + Express + SQLite · 原生前端 · 服务端口 3000
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
